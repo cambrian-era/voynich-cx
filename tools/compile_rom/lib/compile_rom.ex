@@ -3,16 +3,7 @@ defmodule CompileRom do
   Documentation for CompileRom.
   """
 
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> CompileRom.hello()
-      :world
-
-  """
-  def hello do
-    :world
+  def start(_type, _args) do
+    
   end
 end
