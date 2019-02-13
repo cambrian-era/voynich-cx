@@ -116,7 +116,17 @@ defmodule CompileRom.Charset do
       } }) do
     image_start = 18 + id_length + ( map_length * Integer.floor_div( map_size, 8 ) )
     image_length = (Integer.floor_div( bpp, 8 ) * height * width)
-    bytes = Kernel.binary_part(data, image_start, image_length)
-    IO.inspect image_length
+    bits = Kernel.binary_part(data, image_start, byte_size(data) - (image_start + 1)) |>
+    :binary.bin_to_list() |>
+    Enum.chunk_every(2) |>
+    Enum.map(fn ([len, val]) ->
+      Enum.map([0..len], fn n -> val end)
+    end) |> List.flatten()
+
+    get_char = fn (x, y, width, height) ->
+      Enum.map([0..8], fn n -> 
+        
+      end) 
+    end
   end
 end
