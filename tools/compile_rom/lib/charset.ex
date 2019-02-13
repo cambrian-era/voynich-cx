@@ -94,8 +94,7 @@ defmodule CompileRom.Charset do
   def get_color_map(data, 
       %{
         :id_length => id_length, 
-        :map_spec => %{ 
-          :index => index, 
+        :map_spec => %{
           :length => length,
           :size => size 
       } }) do
@@ -110,23 +109,40 @@ defmodule CompileRom.Charset do
       :id_length => id_length,
       :map_spec => %{ :length => map_length, :size => map_size },
       :image_spec => %{
-        :bpp => bpp,
-        :height => height,
+        :height => _height,
         :width => width
       } }) do
-    image_start = 18 + id_length + ( map_length * Integer.floor_div( map_size, 8 ) )
-    image_length = (Integer.floor_div( bpp, 8 ) * height * width)
-    bits = Kernel.binary_part(data, image_start, byte_size(data) - (image_start + 1)) |>
-    :binary.bin_to_list() |>
-    Enum.chunk_every(2) |>
-    Enum.map(fn ([len, val]) ->
-      Enum.map([0..len], fn n -> val end)
-    end) |> List.flatten()
 
-    get_char = fn (x, y, width, height) ->
-      Enum.map([0..8], fn n -> 
-        
-      end) 
+    image_start = 18 + id_length + ( map_length * Integer.floor_div( map_size, 8 ) )
+
+    bytes = Kernel.binary_part(data, image_start, (byte_size(data) - 1) - image_start)
+    # :binary.bin_to_list() |>
+    # Enum.chunk_every(2) |>
+    # Enum.map(fn ([len, val]) ->
+    #   parse_rle(<<len>>, val)
+    #   Enum.into(0..len, [], fn _i -> val end)
+    # end) |> List.flatten()
+
+    get_char = fn (bits, codepoint) ->
+      Enum.map(0..7, fn n ->
+        y = Integer.floor_div(codepoint, 8)
+        x = Integer.mod(codepoint, 8)
+        Enum.slice(bits, (width * y) + (width * n) + (x * 8), 8) |>
+        Enum.into(<<>>, fn bit -> <<bit::1>> end)
+      end)
     end
+    IO.inspect(get_char.(bits, 65))
+  end
+
+  defp parse_rle(<<1::size(1), run::bitstring>>, val) do
+    <<len::integer-size(8)>> = <<0::1, run::bitstring>>
+    Enum.map(0..len + 1, fn _ -> val end)
+  end
+
+  defp parse_rle(<<0::size(1), run::bitstring>>, val) do
+    <<len::integer-size(8)>> = <<0::1, run::bitstring>>
+    len + 1
+
+    [val]
   end
 end
