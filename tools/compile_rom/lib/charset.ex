@@ -11,6 +11,8 @@ defmodule CompileRom.Charset do
         if Map.get(header, :color_map_type) == :hasmap do
           colormap = get_color_map(data, header)
           chars = get_chars(data, header)
+
+          %CompileRom.Charset{ palette: colormap, chars: chars }
         end
       :error ->
         IO.warn(data)
@@ -115,34 +117,42 @@ defmodule CompileRom.Charset do
 
     image_start = 18 + id_length + ( map_length * Integer.floor_div( map_size, 8 ) )
 
-    bytes = Kernel.binary_part(data, image_start, (byte_size(data) - 1) - image_start)
-    # :binary.bin_to_list() |>
-    # Enum.chunk_every(2) |>
-    # Enum.map(fn ([len, val]) ->
-    #   parse_rle(<<len>>, val)
-    #   Enum.into(0..len, [], fn _i -> val end)
-    # end) |> List.flatten()
+    bits = Kernel.binary_part(data, image_start, (byte_size(data)) - image_start) |>
+      :binary.bin_to_list() |>
+      parse_rle([])
 
     get_char = fn (bits, codepoint) ->
       Enum.map(0..7, fn n ->
-        y = Integer.floor_div(codepoint, 8)
-        x = Integer.mod(codepoint, 8)
-        Enum.slice(bits, (width * y) + (width * n) + (x * 8), 8) |>
+        y = Integer.floor_div(codepoint, 16)
+        x = Integer.mod(codepoint, 16)
+
+        Enum.slice(bits, (width * y * 8) + (width * n) + (x * 8), 8) |>
         Enum.into(<<>>, fn bit -> <<bit::1>> end)
-      end)
+      end) |>
+      Enum.into(<<>>, fn byte -> byte end)
     end
-    IO.inspect(get_char.(bits, 65))
+
+    Enum.map(0..255, fn n ->
+      get_char.(bits, n)
+    end)
   end
 
-  defp parse_rle(<<1::size(1), run::bitstring>>, val) do
-    <<len::integer-size(8)>> = <<0::1, run::bitstring>>
-    Enum.map(0..len + 1, fn _ -> val end)
-  end
+  defp parse_rle([ head | data ], acc) do
+    { values, remaining } = case <<head>> do
+      <<1::size(1), run::bitstring>> ->
+        <<len::integer-size(8)>> = <<0::1, run::bitstring>>
+        [ val | tail ] = data
+        { Enum.map(0..len, fn _ -> val end), tail }
+      <<0::size(1), run::bitstring>> ->
+        <<len::integer-size(8)>> = <<0::1, run::bitstring>>
+        Enum.split(data, len + 1)
+    end
 
-  defp parse_rle(<<0::size(1), run::bitstring>>, val) do
-    <<len::integer-size(8)>> = <<0::1, run::bitstring>>
-    len + 1
-
-    [val]
+    bits = Enum.concat(acc, values)
+    if remaining == [] do
+      bits
+    else
+      parse_rle(remaining, bits)
+    end
   end
 end
