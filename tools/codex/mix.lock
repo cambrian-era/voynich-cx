@@ -1,0 +1,6 @@
+%{
+  "elixir_make": {:hex, :elixir_make, "0.5.2", "96a28c79f5b8d34879cd95ebc04d2a0d678cfbbd3e74c43cb63a76adf0ee8054", [:mix], [], "hexpm"},
+  "firmata": {:hex, :firmata, "0.0.2", "cfa484e8e7460958c44ec71bd5fd5f101510a1aaac33520788cae2c5c15010e1", [:mix], [{:nerves_uart, "~> 0.1.2", [hex: :nerves_uart, repo: "hexpm", optional: false]}], "hexpm"},
+  "intel_hex": {:hex, :intel_hex, "0.1.0", "a116198e95491a1bb9005bccb594b83855dfac4e92bffa17120be3991b17e8b4", [:mix], [], "hexpm"},
+  "nerves_uart": {:hex, :nerves_uart, "0.1.2", "4310dbb1721a5a007b8e5c416cf81754415bde6b7e2c9aa65a059886b85e637c", [:make, :mix], [{:elixir_make, "~> 0.4", [hex: :elixir_make, repo: "hexpm", optional: false]}], "hexpm"},
+}

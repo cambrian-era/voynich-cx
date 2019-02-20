@@ -1,6 +1,5 @@
 ---
-subtitle: 8-Bit Computer
-title: "Voynich-CX "
+title: Voynich-CX
 ---
 
 What is it?
@@ -33,3 +32,5 @@ I/O:
 -   VGA out
 
 -   NTSC Composite out
+
+-   MIDI in/out
