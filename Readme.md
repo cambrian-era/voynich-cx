@@ -31,6 +31,28 @@ I/O:
 
 -   VGA out
 
--   NTSC Composite out
+-   NTSC/PAL Composite out
 
 -   MIDI in/out
+
+Video Chip – Elena
+
+Text Mode:
+
+40x25 characters
+
+8 colors available, with bright or dark palette
+
+Each character can be flipped horizontally or vertically
+
+Graphics Mode:
+
+320x200 High Resolution Mode
+
+Sound Chip - Beluna
+===================
+
+Tooling
+=======
+
+ROM build and flashing tool - Codex
