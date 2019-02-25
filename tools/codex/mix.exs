@@ -24,7 +24,7 @@ defmodule Codex.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:intel_hex, "~> 0.1.0"},
+      {:intel_hex, "~> 0.1.0", github: "cambrian-era/intel_hex"},
       {:firmata, "~> 0.0.2", github: "cambrian-era/firmata"}
     ]
   end

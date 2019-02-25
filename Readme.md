@@ -35,9 +35,11 @@ I/O:
 
 -   MIDI in/out
 
-Video Chip – Elena
+Video Chip – Grue
+=================
 
-Text Mode:
+Text Mode
+---------
 
 40x25 characters
 
@@ -45,12 +47,12 @@ Text Mode:
 
 Each character can be flipped horizontally or vertically
 
-Graphics Mode:
+Graphics Mode
+-------------
 
 320x200 High Resolution Mode
 
-Sound Chip - Beluna
-===================
+120x100 High Color Mode
 
 Tooling
 =======
