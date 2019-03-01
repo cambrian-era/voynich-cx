@@ -30,32 +30,44 @@ defmodule Codex.EEPROMWriter do
     {:noreply, state}
   end
 
-
-  def handle_cast(:init_i2c, state) do
-    init_i2c()
+  def init_i2c(pid) do
+    GenServer.cast(pid, :init_i2c)
   end
 
-  defp init_i2c() do
-    IO.inspect state.firmata
-    Firmata.Board.sysex_write(state.firmata, @i2c_config, <<>>)
-    Process.send_after(self(), :read_i2c, 0)
-    state
+  def init_pins(pid) do
+    GenServer.cast(pid, :init_pins)
   end
 
-  def init_pins(state) do
+  def write_byte(pid, <<address::binary>>, <<byte::size(8)>>) do
+    GenServer.call(pid, {:write_byte, address, byte})
+  end
+
+  def handle_cast(:init_pins, state) do
     Enum.each(@byte_pins, fn n ->
       Firmata.Board.set_pin_mode(state.firmata, n, @output)
     end)
 
-    state
+    {:noreply, state}
   end
 
-  def write_byte(state, <<_address::binary>>, <<byte::size(8)>>) do
+  def handle_cast(:init_i2c, state) do
+    IO.inspect(state.firmata)
+    Firmata.Board.sysex_write(state.firmata, @i2c_config, <<>>)
+    Process.send_after(self(), :read_i2c, 0)
+
+    {:noreply, state}
+  end
+
+  def handle_call({:write_byte, _address, byte}, _from, state) do
     Enum.each(byte_digits(byte), fn x ->
       {val, pin} = x
       Firmata.Board.digital_write(state.firmata, pin, val)
     end)
+
+    {:noreply, state}
   end
+
+  # Private
 
   defp byte_digits(byte) do
     digits = Integer.digits(byte, 2)
