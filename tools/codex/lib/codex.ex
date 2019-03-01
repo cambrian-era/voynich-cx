@@ -8,7 +8,6 @@ defmodule Codex do
 
   def compile(path) do
     charset = Codex.Charset.load(Path.join([__DIR__, "../data/voyscii.tga"]))
-    IO.inspect charset
+    IO.inspect(charset)
   end
-
 end

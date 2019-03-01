@@ -7,6 +7,7 @@ defmodule Codex.CLI do
       )
 
     IO.inspect(opts)
+
     cond do
       Keyword.has_key?(opts, :output) ->
         Codex.compile(opts[:output])
