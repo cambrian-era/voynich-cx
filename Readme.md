@@ -54,6 +54,19 @@ Graphics Mode
 
 120x100 High Color Mode
 
+Sound Chip – Snark
+==================
+
+Features
+
+4 Wavetable Channels
+
+Each wavetable consists of a 4x4 bit wave
+
+Registers:
+
+Wavetable – 4 bits
+
 Tooling
 =======
 

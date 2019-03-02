@@ -4,7 +4,6 @@ defmodule Codex.EEPROMWriter do
   use Bitwise
   require Logger
 
-  @i2c_expander 32
   @byte_pins [14, 15, 16, 17, 20, 21, 22, 23]
 
   defmodule State do
@@ -30,12 +29,16 @@ defmodule Codex.EEPROMWriter do
     {:noreply, state}
   end
 
-  def init_i2c(pid) do
-    GenServer.cast(pid, :init_i2c)
+  def handle_info({:read_i2c}, state) do
+    {:noreply, state}
   end
 
-  def init_pins(pid) do
-    GenServer.cast(pid, :init_pins)
+  def init_i2c() do
+    GenServer.cast(__MODULE__, :init_i2c)
+  end
+
+  def init_pins() do
+    GenServer.cast(__MODULE__, :init_pins)
   end
 
   def write_byte(pid, <<address::binary>>, <<byte::size(8)>>) do
@@ -55,10 +58,16 @@ defmodule Codex.EEPROMWriter do
     Firmata.Board.sysex_write(state.firmata, @i2c_config, <<>>)
     Process.send_after(self(), :read_i2c, 0)
 
+    Codex.Hardware.MCP23017.set_mode(:output, state.firmata)
+
     {:noreply, state}
   end
 
-  def handle_call({:write_byte, _address, byte}, _from, state) do
+  def handle_call({:write_byte, address, byte}, _from, state) do
+    # Send an i2c message to the IO expander to specify the address.
+    Codex.Hardware.MCP23017.set_address(address, state.firmata)
+
+    # Set each of the output pins to the state for the byte.
     Enum.each(byte_digits(byte), fn x ->
       {val, pin} = x
       Firmata.Board.digital_write(state.firmata, pin, val)

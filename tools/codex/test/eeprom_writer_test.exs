@@ -1,12 +1,19 @@
 defmodule Codex.EEPROMWriterTest do
   use ExUnit.Case
 
-  test "can connect to a firmata board" do
-    {:ok, pid} =
-      Codex.EEPROMWriter.start_link("COM6")
-      |> Codex.EEPROMWriter.init_i2c(pid)
-      |> Codex.EEPROMWriter.init_pins(pid)
+  describe "the firmata module" do
+    test "can connect to a firmata board" do
+      {response, _pid} = Codex.EEPROMWriter.start_link("COM6")
 
-    Codex.EEPROMWriter.write_byte(pid, <<0x2F>>, <<23>>)
+      assert response == :ok
+    end
+
+    test "can initialize i2c" do
+      Codex.EEPROMWriter.init_i2c()
+    end
+
+    test "can initialize pins" do
+      Codex.EEPROMWriter.init_pins()
+    end
   end
 end
